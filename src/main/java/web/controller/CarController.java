@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import web.dao.CarDao;
 import web.service.CarService;
+import web.service.CarServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,24 +17,24 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/cars")
 public class CarController {
 
-    private CarDao carDao;
+    private CarService carService;
 
     @Autowired
-    public CarController(CarDao carDao) {
-        this.carDao = carDao;
+    public CarController(CarService carService) {
+        this.carService = carService;
     }
 
     @GetMapping
-    public String getListCar(HttpServletRequest request, Model model) {
-        int count = 0;
-        try {
-            count = Integer.parseInt(request.getParameter("count"));
-        } catch (Exception e) {
+    public String getListCar(@RequestParam(name = "count") int count, Model model) {
 
+        if (count >= 0) {
+            model.addAttribute("cars", carService.getListCar(count));
+            return "cars/list";
+        } else {
+            return "cars/errorCount";
         }
-        model.addAttribute("cars", carDao.getListCar(count));
 
-        return "cars/list";
+
     }
 
 }
